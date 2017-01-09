@@ -31,20 +31,19 @@ class CostSource:
                 self.Value = self.Value*(1+float((not (False or np.mod(t,self.ChangeCadence)))*self.ChangeRate))
         return np.array(pStream)
 
+    def calcSmoothStream(self, years, window, order):
+        tmpStream = self.calcStream(years)
+        filtStream = sv.runFilter(tmp, window, order)
+        return filtStream
+
+    def calcSmootherStream(self, years, window, order):
+        tmpStream = self.calcStream(years) 
+        filtStream = sv.runFilter(tmp, window, order)
+        return 2*filtStream
+
     def sumSources(self,s1,s2,s3,s4,s5,s6,s7):
         self.Value += (s1.Value + s2.Value + s3.Value + s4.Value +
                        s5.Value + s6.Value + s7.Value)
-
-    # def sumSourcesMonthly(self,s1,s2,s3,s4,s5,s6,s7):
-    #     for i in nargin
-    #         tmp = kwargs[]
-    #         if tmp.Cadence != fh.MONTHLY:
-    #             tmpVal = tmp.Value
-
-    def smoothStream(self, n, window, order):
-        tmp = self.calcStream(n)
-        sv.runFilter(tmp, window, order)
-
 
 class IncomeSource:
     def __init__(self, v=0, o=0, c=0, cr=0, cc=365, co=0, e=float("inf")):
