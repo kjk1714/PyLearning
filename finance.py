@@ -5,21 +5,22 @@ Created on Fri Jan 5 14:04:59 2017
 @author: Keith
 """
 
-import Sources
+import Sources 
 reload(Sources)
 from Sources import * 
 from operator import add
 import math
 import scipy
 import SavitzkyGolay as sv
-reload(sv)
 import matplotlib.pyplot as plt
 import numpy as np
 import FinanceHeader as fh
-reload(FinanceHeader)
+
+reload(sv)
+reload(fh)
 
 # Constants
-NUMYRS = 3
+NUMYRS = 5
 BANK_INIT = 3800
 
 # Preamble
@@ -47,21 +48,25 @@ Phone = CostSource(79,31,fh.MONTHLY,0,fh.ANNUAL,0,fh.NOEXP)
 CarIns = CostSource(180,23,fh.MONTHLY,0,fh.ANNUAL,0,fh.NOEXP)
 Golf = CostSource(280,15,fh.MONTHLY,fh.INFRATE,fh.ANNUAL,1,fh.NOEXP)
 
+# Build one-time payments
+patent = oneTime(2000,180,NUMYRS)
+
 # Simulate Bank Account
-allIncome = ( paycheck.calcStream(NUMYRS) +
-              rent.calcStream(NUMYRS) +
-              taxes.calcStream(NUMYRS) )
+allIncome = ( paycheck.buildStream(NUMYRS) +
+              rent.buildStream(NUMYRS)     +
+              taxes.buildStream(NUMYRS)    +
+              patent)
 
 # Consolidate bills on credit card and reconcile cadence
 citi = CostSource();
 citi.Offset = 15
 
 citiStream = ( Garbage.calcStream(NUMYRS) +
-               Water.calcStream(NUMYRS) +
-               Cable.calcStream(NUMYRS) +
-               Data.calcStream(NUMYRS) +
-               Phone.calcStream(NUMYRS) +
-               CarIns.calcStream(NUMYRS) +
+               Water.calcStream(NUMYRS)   +
+               Cable.calcStream(NUMYRS)   +
+               Data.calcStream(NUMYRS)    +
+               Phone.calcStream(NUMYRS)   +
+               CarIns.calcStream(NUMYRS)  +
                Golf.calcStream(NUMYRS) )
 
 citiMonthly = np.zeros(len(citiStream))
@@ -72,13 +77,13 @@ for i in range(1,len(citiStream)):
       citiMonthly[i] = acc
       acc = 0
 
-allCosts = ( sky.calcStream(NUMYRS) + 
+allCosts = ( sky.calcStream(NUMYRS)      + 
              discover.calcStream(NUMYRS) +
              mortgage.calcStream(NUMYRS) +
-             car.calcStream(NUMYRS) +
-             lifeins.calcStream(NUMYRS) +
-             rge.calcStream(NUMYRS) +
-             cash.calcStream(NUMYRS) +
+             car.calcStream(NUMYRS)      +
+             lifeins.calcStream(NUMYRS)  +
+             rge.calcStream(NUMYRS)      +
+             cash.calcStream(NUMYRS)     +
              citiMonthly )
 
 bankStream = np.zeros(allIncome.shape[0])
